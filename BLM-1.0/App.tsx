@@ -1,16 +1,26 @@
 /****************** GENERAL IMPORTS ******************/
 /*****************************************************/
 
-import React from 'react';
+import React, {useState} from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { 
   StyleSheet, 
-  //Text, 
-  View 
-  //Image,
-  //TouchableOpacity,
-  //Button 
+  Text, 
+  View, 
+  Image,
+  TouchableOpacity,
+  Button,
+  Modal,
+  Alert,
+  Pressable, 
+  SafeAreaView
 } from 'react-native';
+
+import {Component} from 'react';
+
+//Import the useBLE file we made
+import useBLE from "./useBLE";
+import DeviceModal from './DeviceConnectionModal';
 
 /***************** GLOBAL VARIABLES ******************/
 /*****************************************************/
@@ -19,72 +29,102 @@ import {
 /***************** UI-BASED FUNCTIONS ****************/
 /*****************************************************/
 
-function _Alert_UI( ) {
 
-}
-
-function _Bluetooth_UI( ) {
-  
-}
-
-function _Threat_UI( ) {
-  
-}
-
-function _Locked_UI( ) {
-  
-}
-
-function _Track_UI( ) {
-
-}
-
-/***************** BACKEND FUNCTIONS *****************/
-/*****************************************************/
-
-function _Alert_Funct( ) {
-  return false;
-}
-
-function _Bluetooth_Funct( ) {
-  return false;
-}
-
-function _Threat_Funct( ) {
-  return false;
-}
-
-function _Locked_Funct( ) {
-  return false;
-}
-
-function _Track_Funct( ) {
-  return false;
-}
 
 /***************** MAIN APP FUNCTION *****************/
-/*****************************************************/
 
 export default function App() {
   
-  //Declare and define variable
-  let x = 1;
+  //Parameters returned from useBLE
+  const {
+    requestPermissions,
+    scanForPeripherals,
+    // allDevices,
+    // connectToDevice,
+    // connectedDevice,
+    // boardLockData,
+    // disconnectFromDevice,
+  } = useBLE();
 
-  //Logging function... only use for debugging. Comment out ottherwise.
-  console.log("BoardLockMobile running...");
- 
-  //Random function
-  const handlePress = () => console.log("Text pressed.");
+  //Variables used to control the modal/popups
+  const [isModalVisible, setModalVisible] = useState<boolean>(false);
 
-  return (   
-   
-    <View style={styles.alert_bluetooth}>
 
-    </View>
-       
+  const scanForDevices = async () => {
+    const isPermissionsEnabled = await requestPermissions();
+    if (isPermissionsEnabled) {
+      scanForPeripherals();
+    }
+  };
+
+  const hideModal = () => {
+    setModalVisible(false);
+  };
+
+  const openModal = async () => {
+    scanForDevices();
+    setModalVisible(true);
+  };
+  
+  return (
+    <SafeAreaView style={styles.general}>
+      <View style={styles.logo}>
+        <Image 
+          style={{width: 350}}
+          resizeMode="contain"
+          source={require("./assets/BoardLock_In_Board_Empty.png")}
+        />
+      </View>
+
+      <View style={styles.randomSpace}></View>
+
+
+
+
+      <View style={styles.buttonBackground}>
+        <TouchableOpacity onPress={openModal} style={styles.button}>
+          <Text style={{fontSize: 20, fontWeight: 'bold', color: 'white'}}>
+            {"Pair Device"}
+          </Text>
+        </TouchableOpacity>
+      </View>
+      
+      
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isModalVisible}
+        onRequestClose={() => {
+          Alert.alert('Modal has been closed.');
+          setModalVisible(!isModalVisible);
+        }}>
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>Hello World!</Text>
+            <Pressable
+              style={[styles.button, styles.buttonClose]}
+              onPress={() => hideModal()}>
+              <Text style={styles.textStyle}>Hide Modal</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+
+      {/* <DeviceModal
+        closeModal={hideModal}
+        visible={isModalVisible}
+        connectToPeripheral={() => {}}
+        devices={[]}
+      />  */}
+
+
+
+    </SafeAreaView>
 
   );
-}
+};
+
 
 /********************   STYLES   *********************/
 /*****************************************************/
@@ -94,7 +134,7 @@ const styles = StyleSheet.create({
   
   //Similar to CSS but not CSS
 
-  alert_bluetooth: {
+  general: {
     flex: (1), //Flexible to fill 100% of the available screen space
     backgroundColor: 'rgb(107, 107, 107)',
     alignItems: 'center',
@@ -102,52 +142,98 @@ const styles = StyleSheet.create({
   },
 
   logo: {
-    flex: (1), //Flexible to fill 100% of the available screen space
-    backgroundColor: 'rgb(80, 125, 115)',
+    flex: (5), //Flexible to fill 100% of the available screen space
+    backgroundColor: 'rgb(107, 107, 107)',
     alignItems: 'center',
     justifyContent: 'center',
   },
 
-  page: {
-    flex: (1), //Flexible to fill 100% of the available screen space
+  buttonBackground: {
+    flex: (4), //Flexible to fill 100% of the available screen space
+    backgroundColor: 'rgb(107, 107, 107)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 1,
+  }, 
+
+  button: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgb(151, 151, 151)',
+    paddingHorizontal: 30,
+    paddingVertical: 10
+  }, 
+
+  randomSpace: {
+    flex: (10), //Flexible to fill 100% of the available screen space
     backgroundColor: 'rgb(107, 107, 107)',
     alignItems: 'center',
     justifyContent: 'center',
   }, 
 
-  threat: {
-    flex: (2/10), //Flexible to fill 100% of the available screen space
-    backgroundColor: 'rgb(80, 125, 115)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  }, 
 
-  locked: {
-    flex: (2/10), //Flexible to fill 100% of the available screen space
-    backgroundColor: 'rgb(107, 107, 107)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  }, 
 
-  track: {
-    flex: (2/10), //Flexible to fill 100% of the available screen space
-    backgroundColor: 'rgb(80, 125, 115)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  }, 
 
-  settings: {
-    flex: (1/10), //Flexible to fill 100% of the available screen space
-    backgroundColor: 'rgb(107, 107, 107)',
-    alignItems: 'center',
+
+
+  
+
+  centeredView: {
+    flex: 1,
     justifyContent: 'center',
-  } 
+    alignItems: 'center',
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  buttonOpen: {
+    backgroundColor: '#F194FF',
+  },
+  buttonClose: {
+    backgroundColor: '#2196F3',
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  modalText: {
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+
 });
+
 
 /*********************   NOTES   *********************/
 /*****************************************************/
 
 /*
+      <View style={styles.buttonBackground}>
+        <TouchableOpacity style={styles.button} onPress={() => alert("You pressed a useless button.")}>
+          <Text style={{fontSize: 20, fontWeight: 'bold', color: 'white'}}>Useless Button</Text> 
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.buttonBackground}>
+        <TouchableOpacity style={styles.button} onPress={() => console.log("Button pressed.")}>
+          <Text style={{fontSize: 20, fontWeight: 'bold', color: 'white'}}>Press For Fun</Text> 
+        </TouchableOpacity>
+      </View>
+
       <Text onPress={handlePress}>BoardLock</Text>
 
       <Button 
